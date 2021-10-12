@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import sys
  
 import pygame
@@ -12,12 +13,14 @@ unit_multiplier = 2
 # Head ska vara nere i vänstra hörnet
 
 # I dictionaryn keys finns en nestad dictionary med positioner som behöver head adderat och sedan multiplier gångrat
-# Head_offset ska adderas till head och 
+# Head_offset ska adderas till head och color definerar färgen som ska fylla tangenten
 keys = {}
-keys["C"] = {"positions": [(0,0), (0,137), (30,137), (30,91), (17,91), (17,0), (0,0)], "head_offset": (30,0), "color": (255,255,255)}
-keys["C#"] = {"positions": [(0,0), (0,91), (20,91), (20,0), (0,0)], "head_offset": (30,0), "color": (0,0,0)}
-keys["D"] = {"positions": [(0,0), (0,91), (-7,91), (-7,137), (23,137), (23,91), (17,91), (17,0), (0,0)], "head_offset": (30,0), "color": (255,255,255)}
-keys["E"] = {"positions": [(0,0), (0,91), (-13,91), (-13,137), (17,137), (17,0), (0,0)], "head_offset": (30,0), "color": (255,255,255)}
+keys["C"] = {"positions": [(0,0), (0,137), (30,137), (30,91), (17,91), (17,0), (0,0)], "head_offset": (33,0), "color": (255,255,255)}
+keys["C#"] = {"positions": [(0,0), (0,91), (20,91), (20,0), (0,0)], "head_offset": (33,0), "color": (0,0,0)}
+keys["D"] = {"positions": [(0,0), (0,91), (-7,91), (-7,137), (23,137), (23,91), (17,91), (17,0), (0,0)], "head_offset": (33,0), "color": (255,255,255)}
+keys["E"] = {"positions": [(0,0), (0,91), (-13,91), (-13,137), (17,137), (17,0), (0,0)], "head_offset": (33,0), "color": (255,255,255)}
+keys["G"] = {"positions": [(0,0), (0,91), (-7,91), (-7,137), (25,137), (25,91), (17,91), (17,0), (0,0)], "head_offset": (33,0), "color": (255,255,255)}
+keys["A"] = {"positions": [(0,0), (0,91), (-9,91), (-9,137), (23,137), (23,91), (17,91), (17,0), (0,0)], "head_offset": (33,0), "color": (255,255,255)}
 
 # Identiska knappar
 keys["D#"] = keys["C#"]
@@ -26,8 +29,6 @@ keys["G#"] = keys["C#"]
 keys["A#"] = keys["C#"]
 
 keys["F"] = keys["C"]
-keys["G"] = keys["D"]
-keys["A"] = keys["D"]
 keys["B"] = keys["E"]
 # Drawing head 
 head = (0,0)
@@ -58,7 +59,7 @@ def run(head, keys, multiplier):
     fps = 10
     fpsClock = pygame.time.Clock()
      
-    width, height = 720, 480
+    width, height = 1000, 480
     screen = pygame.display.set_mode((width, height))
     # Game loop.
     while True:
