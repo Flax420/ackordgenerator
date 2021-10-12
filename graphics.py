@@ -4,13 +4,8 @@ import sys
 import pygame
 from pygame.draw import polygon, rect
 from pygame.locals import *
+import sound
  
-unit_multiplier = 2
-# Vanlig tangent 10 * 72 units
-# Svart tangent 6 * 42 units
-# 30 units upp till svart tangent
-# 3 units in från svart tangent
-# Head ska vara nere i vänstra hörnet
 
 # I dictionaryn keys finns en nestad dictionary med positioner som behöver head adderat och sedan multiplier gångrat
 # Head_offset ska adderas till head och color definerar färgen som ska fylla tangenten
@@ -53,13 +48,18 @@ def change_headpos(head, key, keys, multiplier):
         _y += keys[key]["head_offset"][1] * multiplier
     return (_x, _y)
 
+def return_head():
+    return (0,0)
+
 def run(head, keys, multiplier):
     pygame.init()
     keylist = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] * 2
     fps = 10
     fpsClock = pygame.time.Clock()
+    _toner = list(("c", "c#", "c"))
+    print(_toner)
      
-    width, height = 1000, 480
+    width, height = 794, 480
     screen = pygame.display.set_mode((width, height))
     # Game loop.
     while True:
@@ -70,18 +70,23 @@ def run(head, keys, multiplier):
                 sys.exit()
 
         # Update.
-
+        _toner = list(("c", "c#", "c"))
         # Draw
         for key in keylist:
             _cords = get_key_polygon(head, key, keys, multiplier)
             head = change_headpos(head, key, keys, multiplier)
-            pygame.draw.polygon(screen, keys[key]["color"], _cords, width=0)
-            pygame.draw.polygon(screen, (57,57,57), _cords, width=1)
+            color = keys[key]["color"]
+            if _toner and _toner[0].upper() == key:
+                color = (203, 68, 61)
+                _toner.pop(0)
+
+            pygame.draw.polygon(screen, color, _cords, width=0) # Knapp
+            pygame.draw.polygon(screen, (57,57,57), _cords, width=1) # Outline
         
 
         #keylist.append(keylist.pop(0))
         #pygame.draw.polygon(screen, keys[key]["color"], keys[key]["positions"])
-        head = (0,0)
+        head = return_head()
         pygame.display.flip()
         fpsClock.tick(fps)
 
