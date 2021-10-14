@@ -29,7 +29,7 @@ keys["B"] = keys["E"]
 head = (0,0)
 
 # Returnerar kordinater för en polygon
-def get_key_polygon(head, key, keys, multiplier):
+def get_key_coordinates(head, key, keys, multiplier):
     _kordinater = [] # Standardvärde
     if key in keys:
         for k in keys[key]["positions"]:
@@ -48,41 +48,67 @@ def change_headpos(head, key, keys, multiplier):
         _y += keys[key]["head_offset"][1] * multiplier
     return (_x, _y)
 
+# Returnerar rithuvudet till origo
 def return_head():
     return (0,0)
+
+# Ritar tangenter med outline etc
+def draw_keys(keylist, keys, head, chord, outline_color, highlight_color, surface, multiplier):
+    _chord = chord.copy() # Kopiera variabeln för att förhindra att funktionen ändrar den
+    for key in keylist:
+            _cords = get_key_coordinates(head, key, keys, multiplier)
+            head = change_headpos(head, key, keys, multiplier)
+            color = keys[key]["color"]
+            if _chord and _chord[0].upper() == key:
+                color = highlight_color
+                _chord.pop(0)
+
+            pygame.draw.polygon(surface, color, _cords, width=0) # Knapp
+            pygame.draw.polygon(surface, outline_color, _cords, width=1) # Outline
+
+# Spelar ett ackord
+def play_chord(chord):
+    for c in chord:
+        if c.upper() in sound.sound_dictionary:
+            sound.sound_dictionary[c.upper()].stop()
+            sound.sound_dictionary[c.upper()].play()
 
 def run(head, keys, multiplier):
     pygame.init()
     keylist = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] * 2
-    fps = 10
+    _toner = list(("c", "e", "g")) # Temporary variable
+    input_rect = pygame.Rect(200, 200, 140, 32)
+    outline_color = (57,57,57)
+    highlight_color = (203, 68, 61)
+
+    fps = 60
     fpsClock = pygame.time.Clock()
-    _toner = list(("c", "c#", "c"))
-    print(_toner)
-     
+
     width, height = 794, 480
     screen = pygame.display.set_mode((width, height))
+    base_font = pygame.font.Font(None, 16)
+
+    user_text = []
     # Game loop.
     while True:
         screen.fill((128,128,128))
         for event in pygame.event.get():
+            if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE and user_text:
+                    user_text.pop(-1)
+                elif event.key==pygame.K_RETURN:
+                    # Parsa/Hämta ackord här
+                    play_chord(_toner)
+                else:
+                    user_text += event.unicode
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
 
         # Update.
-        _toner = list(("c", "c#", "c"))
-        # Draw
-        for key in keylist:
-            _cords = get_key_polygon(head, key, keys, multiplier)
-            head = change_headpos(head, key, keys, multiplier)
-            color = keys[key]["color"]
-            if _toner and _toner[0].upper() == key:
-                color = (203, 68, 61)
-                _toner.pop(0)
 
-            pygame.draw.polygon(screen, color, _cords, width=0) # Knapp
-            pygame.draw.polygon(screen, (57,57,57), _cords, width=1) # Outline
-        
+        # Draw
+        draw_keys(keylist,keys,head,_toner,outline_color,highlight_color,screen,multiplier)
 
         #keylist.append(keylist.pop(0))
         #pygame.draw.polygon(screen, keys[key]["color"], keys[key]["positions"])
@@ -90,6 +116,7 @@ def run(head, keys, multiplier):
         pygame.display.flip()
         fpsClock.tick(fps)
 
+# Test function
 def main():
     global keys
     head = (0, 0)
