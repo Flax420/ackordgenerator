@@ -73,10 +73,29 @@ def play_chord(chord):
             sound.sound_dictionary[c.upper()].stop()
             sound.sound_dictionary[c.upper()].play()
 
+def demo_mode(demo_index, demo_delay, demo_delay_counter, keylist, toner):
+    demo_delay_counter += 1
+    if demo_delay_counter >= demo_delay:
+        demo_delay_counter = 0
+        demo_index += 1
+        toner = [keylist[demo_index]]
+        if demo_index == len(keylist)-1:
+            demo_index = 0
+    return (demo_index, demo_delay_counter, toner)
+
 def run(head, keys, multiplier):
     pygame.init()
-    keylist = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"] * 2
-    _toner = list(("c", "e", "g")) # Temporary variable
+    base_keylist = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    keylist = []
+    for i in range(1, 4):
+        for key in base_keylist:
+            keylist.append(f"{key}{i}")
+            keys[f"{key}{i}"] = keys[key]
+    demo = False
+    demo_index = 0
+    demo_delay = 5
+    demo_delay_counter = 0
+    _toner = list(("b", "d#", "f#", "a", "c#", "e", "g#")) # Temporary variable
     input_rect = pygame.Rect(200, 200, 140, 32)
     outline_color = (57,57,57)
     highlight_color = (203, 68, 61)
@@ -84,7 +103,7 @@ def run(head, keys, multiplier):
     fps = 60
     fpsClock = pygame.time.Clock()
 
-    width, height = 794, 480
+    width, height = 1191, 480
     screen = pygame.display.set_mode((width, height))
     base_font = pygame.font.Font(None, 16)
 
@@ -96,6 +115,8 @@ def run(head, keys, multiplier):
             if event.type==pygame.KEYDOWN:
                 if event.key == pygame.K_BACKSPACE and user_text:
                     user_text.pop(-1)
+                elif event.key==pygame.K_DELETE:
+                    demo = not demo
                 elif event.key==pygame.K_RETURN:
                     # Parsa/Hämta ackord här
                     play_chord(_toner)
@@ -106,7 +127,9 @@ def run(head, keys, multiplier):
                 sys.exit()
 
         # Update.
-
+        # Demoläge
+        if demo:
+            (demo_index, demo_delay_counter, _toner) = demo_mode(demo_index, demo_delay, demo_delay_counter, keylist, _toner)
         # Draw
         draw_keys(keylist,keys,head,_toner,outline_color,highlight_color,screen,multiplier)
 
