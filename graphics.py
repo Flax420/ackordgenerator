@@ -7,6 +7,8 @@ import pygame
 import sound
 import parse
 import chord
+from threading import Thread
+from time import sleep
 
 # I dictionaryn keys finns en nestad dictionary med positioner som behöver head adderat och sedan multiplier gångrat
 # Head_offset ska adderas till head och color definerar färgen som ska fylla tangenten
@@ -28,7 +30,7 @@ keys["F"] = keys["C"]
 keys["B"] = keys["E"]
 # Drawing head 
 head = (0,0)
-
+pygame.mixer.set_num_channels(10)
 # Returnerar kordinater för en polygon
 def get_key_coordinates(head, key, keys, multiplier):
     _kordinater = [] # Standardvärde
@@ -68,11 +70,24 @@ def draw_keys(keylist, keys, head, chord, outline_color, highlight_color, surfac
             pygame.draw.polygon(surface, outline_color, _cords, width=1) # Outline
 
 # Spelar ett ackord
-def play_chord(chord):
-    for c in chord:
-        if c.upper() in sound.sound_dictionary:
+def play_chord(chord, delay):
+    print(chord)
+    i = 0
+    if delay:
+        for c in chord:
+            #if c.upper() in sound.sound_dictionary:
             sound.sound_dictionary[c.upper()].stop()
-            sound.sound_dictionary[c.upper()].play()
+            pygame.mixer.Channel(i).play(sound.sound_dictionary[c.upper()])
+            sleep(.4)
+            i+= 1
+        i = 0
+        sleep(0.5)
+    for c in chord:
+        sound.sound_dictionary[c.upper()].stop()
+        pygame.mixer.Channel(i).play(sound.sound_dictionary[c.upper()])
+        i += 1
+
+
 
 def demo_mode(demo_index, demo_delay, demo_delay_counter, keylist, toner):
     demo_delay_counter += 1
@@ -97,6 +112,7 @@ def run(head, keys, multiplier):
     demo_delay = 5
     demo_delay_counter = 0
     _toner = list() # Temporary variable
+    delay = False
 
     input_rect = pygame.Rect(1, 275, 1191, 32)
     input_rect_color = pygame.Color((255,255,255))
@@ -117,6 +133,8 @@ def run(head, keys, multiplier):
         screen.fill((128,128,128))
         for event in pygame.event.get():
             if event.type==pygame.KEYDOWN:
+                if event.key == pygame.K_LSHIFT:
+                    delay = True
                 if event.key == pygame.K_BACKSPACE and user_text:
                     user_text.pop(-1)
                 elif event.key==pygame.K_DELETE:
@@ -125,10 +143,13 @@ def run(head, keys, multiplier):
                     # Parsa/Hämta ackord här
                     bla = parse.parse_note("".join(user_text), parse.notes_search_order, parse.note_dict)
                     _toner = list(chord.get_chord(bla[0], bla[1]))
-                    play_chord(_toner)
-
+                    thread = Thread(target = play_chord, args= (list(_toner), delay, ))
+                    thread.start()
                 else:
                     user_text += event.unicode
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LSHIFT:
+                    delay = False
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
