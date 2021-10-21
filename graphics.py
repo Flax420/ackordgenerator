@@ -141,10 +141,14 @@ def run(head, keys, multiplier):
                     demo = not demo
                 elif event.key==pygame.K_RETURN:
                     # Parsa/Hämta ackord här
-                    bla = parse.parse_note("".join(user_text), parse.notes_search_order, parse.note_dict)
-                    _toner = list(chord.get_chord(bla[0], bla[1]))
-                    thread = Thread(target = play_chord, args= (list(_toner), delay, ))
-                    thread.start()
+                    chord_string = parse.parse_note("".join(user_text), parse.notes_search_order, parse.note_dict)
+                    _toner = chord.get_chord(chord_string[0], chord_string[1])
+                    if not _toner == None:
+                        _toner = list(_toner)
+                        thread = Thread(target = play_chord, args= (_toner, delay, ))
+                        thread.start()
+                    else:
+                        _toner = []
                 else:
                     user_text += event.unicode
             if event.type == pygame.KEYUP:
@@ -163,7 +167,8 @@ def run(head, keys, multiplier):
         if demo:
             (demo_index, demo_delay_counter, _toner) = demo_mode(demo_index, demo_delay, demo_delay_counter, keylist, _toner)
         # Draw
-        draw_keys(keylist,keys,head,_toner,outline_color,highlight_color,screen,multiplier)
+        if not _toner == None:
+            draw_keys(keylist,keys,head,_toner,outline_color,highlight_color,screen,multiplier)
 
         #keylist.append(keylist.pop(0))
         #pygame.draw.polygon(screen, keys[key]["color"], keys[key]["positions"])
