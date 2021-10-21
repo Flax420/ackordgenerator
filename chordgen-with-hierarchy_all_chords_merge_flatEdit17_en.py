@@ -354,28 +354,6 @@ def listToString(aList):
         str1 += x
     return(str1)
 
-def chordTriggercopy(s, i, fsToken, hierarchyList):
-    print(s)
-    print(i)
-    if len(fsToken) > 0:
-        key = listToString(fsToken)
-        FC = firstCharLowerUpper(key)
-        newKey = stringSplitMerge(key, FC)
-    else:
-        key = s
-        FC = firstCharLowerUpper(key)
-        newKey = stringSplitMerge(key, FC)
-    chordBook = {"":"major", "m":"m", "m7":"m7", "m7b5":"m7b5", "mM7":"mM7", "m6":"m6", "m9":"m9", "m11":"m11", "m13":"m13", "5":"ch5", "7":"ch7", "7+5":"ch7s5", "9":"ch9", "11":"ch11", "13":"ch13", "maj7":"maj7", "maj9":"maj9", "maj13":"maj13", "6":"ch6", "6/9":"ch6_9", "add2":"add2", "add9":"add9", "sus2":"sus2", "sus4":"sus4", "dim":"dim", "dim7":"dim7", "aug":"aug", "aug7":"aug7"}
-    #i = input("Select a chord: ")
-    if i in chordBook:
-        print(chordBook[i])
-        function_name = chordBook[i]
-        chord = eval(function_name)(hierarchyList)
-        return(chord)
-    return(None)
-        
-
-
 def chordTrigger(s, fsToken, hierarchyList):
     if len(fsToken) > 0:
         key = listToString(fsToken)
@@ -457,7 +435,15 @@ def displayCorrectChord(fsToken, chordTuple):
             
 # End of functions
 
-def get_chord(s, chord):
+
+
+'''
+//////////////////////  GLOBAL AREA  //////////////////////
+'''
+
+
+
+while True:
     # Default lists
     dictNotes = {1:"a1", 2:"a#1", 3:"b1", 4:"c1", 5:"c#1", 6:"d1", 7:"d#1", 8:"e1", 9:"f1", 10:"f#1", 11:"g1", 12:"g#1"}
     listNotes = ["a1", "a#1", "b1", "c1", "c#1", "d1", "d#1", "e1", "f1", "f#1", "g1", "g#1"]
@@ -468,13 +454,13 @@ def get_chord(s, chord):
 
     # Start: input key (music) and transpose
 
-    #s = selectKey()
-    #s = checkIfValid(s)
-    #s = flatToSharp(s, fsToken)
+    s = selectKey()
+    s = checkIfValid(s)
+    s = flatToSharp(s, fsToken)
 
     #print(fsToken)
     #print(s)
-    s = s.lower()
+
     n = dictNumbers[s]
     transpose(transList, dictNumbers, n)
     indexToNote(transListNotes, transList, listNotes)
@@ -504,106 +490,51 @@ def get_chord(s, chord):
     '''
     >>>>>> send chordTuple to GUI
     '''
-    chordTuple = chordTriggercopy(s, chord, fsToken, hierarchyList)
 
-    return chordTuple
+    chordTuple = chordTrigger(s, fsToken, hierarchyList)
+    #print(chordTuple)
+    
 
-'''
-//////////////////////  GLOBAL AREA  //////////////////////
-'''
 
-if __name__ == "__main__":
+    '''
+    |||||||||||||||||  Pre GUI   |||||||||||||||||
+    '''
+
+
+
+
+
+
+
+
+    '''
+    |||||||||||||||||  Post GUI  |||||||||||||||||
+    '''
+
+
+
+    # Only for display
+
+    displayChordList = displayCorrectChord(fsToken, chordTuple)
+    displayChordTuple = listToTuple(displayChordList)
+    print()
+    print("Notes:")
+    print()
+    print(displayChordTuple)
+    
+    # Restart or exit
+    
+    print()
     while True:
-        # Default lists
-        dictNotes = {1:"a1", 2:"a#1", 3:"b1", 4:"c1", 5:"c#1", 6:"d1", 7:"d#1", 8:"e1", 9:"f1", 10:"f#1", 11:"g1", 12:"g#1"}
-        listNotes = ["a1", "a#1", "b1", "c1", "c#1", "d1", "d#1", "e1", "f1", "f#1", "g1", "g#1"]
-        dictNumbers = {"a":1, "a#":2, "b":3, "c":4, "c#":5, "d":6, "d#":7, "e":8, "f":9, "f#":10, "g":11, "g#":12}
-        transList = []
-        transListNotes = []
-        fsToken = []
-
-        # Start: input key (music) and transpose
-
-        s = selectKey()
-        s = checkIfValid(s)
-        s = flatToSharp(s, fsToken)
-
-        #print(fsToken)
-        #print(s)
-        n = dictNumbers[s]
-        transpose(transList, dictNumbers, n)
-        indexToNote(transListNotes, transList, listNotes)
-
-        #print("Transposed scale: ")
-        #print(transListNotes)
-        #print()
-
-        # Change dictionary according to transposition
-        changeDictNotes(transListNotes, dictNotes)
-
-        # Transposed note dictionary
-        #print("New dictionary: ")
-        #print(dictNotes)
-        if s != "c": # OBS! för att c (default scale, all octave 1) ska fungera
-            hierarchyList = hierarchy(dictNotes)
-        #    print()
-        #    print("Hierarkiskt dictionary för skalan: ")
-        #    print()
-        #    print(hierarchyList)
-        else:
-            hierarchyList = dictNotes # Hädanefter är hierarchyList main dictionary
-
-
-
-        # Chord trigger
-        '''
-        >>>>>> send chordTuple to GUI
-        '''
-        chordTuple = chordTrigger(s, fsToken, hierarchyList)
-        #
-        #print(chordTuple)
-        
-
-
-        '''
-        |||||||||||||||||  Pre GUI   |||||||||||||||||
-        '''
-
-
-
-
-
-
-
-
-        '''
-        |||||||||||||||||  Post GUI  |||||||||||||||||
-        '''
-
-
-
-        # Only for display
-
-        displayChordList = displayCorrectChord(fsToken, chordTuple)
-        displayChordTuple = listToTuple(displayChordList)
-        print()
-        print("Notes:")
-        print()
-        print(displayChordTuple)
-        
-        # Restart or exit
-        
-        print()
-        while True:
-            restart = input("Press r to try another chord, or press q to exit. ")
-            if restart == "r":
-                break
-            elif restart == "q":
-                break
-            else:
-                pass
+        restart = input("Press r to try another chord, or press q to exit. ")
         if restart == "r":
-            print()
-            pass
+            break
         elif restart == "q":
             break
+        else:
+            pass
+    if restart == "r":
+        print()
+        pass
+    elif restart == "q":
+        break

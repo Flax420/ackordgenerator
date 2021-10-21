@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
-import sys
- 
+import sys 
 import pygame
 from pygame.draw import polygon, rect
 from pygame.locals import *
+import pygame
 import sound
- 
+import parse
+import chord
 
 # I dictionaryn keys finns en nestad dictionary med positioner som behöver head adderat och sedan multiplier gångrat
 # Head_offset ska adderas till head och color definerar färgen som ska fylla tangenten
@@ -95,17 +96,20 @@ def run(head, keys, multiplier):
     demo_index = 0
     demo_delay = 5
     demo_delay_counter = 0
-    _toner = list(("b", "d#", "f#", "a", "c#", "e", "g#")) # Temporary variable
-    input_rect = pygame.Rect(200, 200, 140, 32)
+    _toner = list() # Temporary variable
+
+    input_rect = pygame.Rect(1, 275, 1191, 32)
+    input_rect_color = pygame.Color((255,255,255))
+
     outline_color = (57,57,57)
     highlight_color = (203, 68, 61)
 
     fps = 60
     fpsClock = pygame.time.Clock()
 
-    width, height = 1191, 480
+    width, height = 1191, 307
     screen = pygame.display.set_mode((width, height))
-    base_font = pygame.font.Font(None, 16)
+    base_font = pygame.font.Font(None, 32)
 
     user_text = []
     # Game loop.
@@ -119,7 +123,10 @@ def run(head, keys, multiplier):
                     demo = not demo
                 elif event.key==pygame.K_RETURN:
                     # Parsa/Hämta ackord här
+                    bla = parse.parse_note("".join(user_text), parse.notes_search_order, parse.note_dict)
+                    _toner = list(chord.get_chord(bla[0], bla[1]))
                     play_chord(_toner)
+
                 else:
                     user_text += event.unicode
             if event.type == QUIT:
@@ -127,6 +134,10 @@ def run(head, keys, multiplier):
                 sys.exit()
 
         # Update.
+        # Inputrect för att skriva in Ackord
+        pygame.draw.rect(screen, input_rect_color, input_rect)
+        text_surface = base_font.render("".join(user_text), True, (0,0,0))
+        screen.blit(text_surface, (input_rect.x+5, input_rect.y+5)) 
         # Demoläge
         if demo:
             (demo_index, demo_delay_counter, _toner) = demo_mode(demo_index, demo_delay, demo_delay_counter, keylist, _toner)

@@ -8,8 +8,8 @@ sound_dictionary = {}
 
 for i in range(1, 4):
     for key in keylist:
-        sound_dictionary[f"{key}{i}"] = Sound(f"./sounds/{key.lower()}{i+3}.ogg")
-
+        sound_dictionary[f"{key}{i}"] = Sound(f"./sounds/{key.lower()}{i}.mp3")
+        sound_dictionary[f"{key}{i}"].set_volume(0.2)
 # Demo 
 if __name__ == "__main__":
     sound_dictionary["C1"].play()

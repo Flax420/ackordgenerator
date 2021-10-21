@@ -2,7 +2,7 @@
 
 def parse_note(string, note_search, note_dict):
     note = get_note(string,note_search,note_dict)
-    return(note, get_chord(string, note).lower())
+    return(note, get_chord(string, note).lower().replace(" ", ""))
 
 def get_note(string, note_search, note_dict):
     for n in note_search:
